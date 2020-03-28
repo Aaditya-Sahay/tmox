@@ -1,5 +1,7 @@
 
 import Scanner from './scanner'
+import fs from 'fs'
+
 export default class Tmox {
     file: string
     hadError: boolean
@@ -20,19 +22,20 @@ export default class Tmox {
     }
     // executes file 
     execute(){
-
+        let string = fs.readFileSync(this.file).toString()
+        this.run(string)
     }
     //executes prompts
     prompt(){
 
     }
     //scanner 
-    run() {
-        let scanner = new Scanner("source");
+    run(source: string) {
+        let scanner = new Scanner(source, this);
         let tokens = scanner.tokenize();
-        // for (let token in tokens) {
-        //     console.log(token);
-        // }
+        for (let token of tokens) {
+            console.log(token);
+        }
     }
 
     report(line: number, where: string, message: string){
