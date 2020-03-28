@@ -180,7 +180,7 @@ export default class Scanner {
         }
         this.addToken(TokenType.NUMBER, Number(this.source.substring(this.start, this.current)))
     }
-
+    
     scanIdentifier() {
         while (this.isAlphaNumeric(this.peek())) this.proceed();
         let text: string = this.source.substring(this.start, this.current);

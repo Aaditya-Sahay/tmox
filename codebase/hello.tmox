@@ -1,5 +1,4 @@
-// this is a comment
-(( )){} // grouping stuff
-!*+-/=<> <= == hello // operators
-450.20
-while 10 for 10
+// this is the tmox language
+while true {
+    print "hello nesse" + 2
+}
