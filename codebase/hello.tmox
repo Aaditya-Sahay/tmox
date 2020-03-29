@@ -21,8 +21,13 @@
 
 
 
-dec hello = 10 * 100;
-dec notHello = "string";
-dec superHello = 10;
-print hello + superHello;
-print notHello;
+
+
+
+dec twenty = 20;
+dec thirty = 30;
+thirty = 40;
+
+print twenty + 30;
+print twenty + thirty;
+print twenty - thirty;

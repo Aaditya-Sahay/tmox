@@ -106,6 +106,12 @@ export default class Interpreter implements Expression.Visitor<any>, Statement.V
         return this.environment.get(expr.name)
     }
 
+    visitAssignExpr(expr: Expression.Assign): any {
+        let value: any = this.evaluate(expr.value)
+        this.environment.assign(expr.name, value)
+
+    }
+
     visitDecStmt(stmt: Statement.Declare): void {
         let value = null;
         if (stmt.initializer != null) {

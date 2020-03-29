@@ -4,7 +4,7 @@ import Token from './token'
 
 
 export interface Visitor<R> {
-    // visitAssignExpr(expr: Assign): R;         
+    visitAssignExpr(expr: Assign): R;         
     visitBinaryExpr(expr: Binary): R;         
     // visitCallExpr(expr: Call): R;             
     // visitGetExpr(expr: Get): R;               
@@ -38,18 +38,18 @@ export class Binary extends Expr {
     }
 }
 
-// export class Assign extends Expr {
-//     name: Token
-//     value: Expr
-//     constructor(name: Token, value: Expr) {
-//         super()
-//         this.name = name;
-//         this.value = value;
-//     }
-//     accept(visitor: Visitor<any>): any{             
-//         return visitor.visitAssignExpr(this);        
-//     }
-// }
+export class Assign extends Expr {
+    name: Token
+    value: Expr
+    constructor(name: Token, value: Expr) {
+        super()
+        this.name = name;
+        this.value = value;
+    }
+    accept(visitor: Visitor<any>): any{             
+        return visitor.visitAssignExpr(this);        
+    }
+}
 
 // export class Call extends Expr {
 //     callee: Expr

@@ -1,7 +1,7 @@
 import Tmox from './tmox'
 import Token from './token'
 import TokenType from './tokentype'
-import { Expr, Binary, Unary, Literal, Grouping, Variable } from './expression'
+import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign } from './expression'
 import { Stmt, Print, Expression, Declare } from './statement'
 
 class ParseError extends Error{
@@ -23,11 +23,7 @@ export default class Parser {
         let statements = new Array<Stmt>()
 
         while (!this.isEnd()){
-
-          
-                statements.push(this.declaration())
-  
-        
+            statements.push(this.declaration())
         }
 
         return statements;
@@ -78,7 +74,23 @@ export default class Parser {
     }
 
     expression(): Expr {
-        return this.equality()
+        return this.assignment()
+    }
+
+    assignment(): Expr{
+        let expr: Expr = this.equality();
+        if (this.match(TokenType.EQUAL)){
+            let equals: Token = this.previous();
+            let value: Expr = this.assignment()
+
+            if (expr instanceof Variable){
+                let name: Token = expr.name;
+                return new Assign(name, value)
+            }
+
+            this.error(equals, "Invalid assignment")
+        }
+        return expr
     }
 
     equality(): Expr {
