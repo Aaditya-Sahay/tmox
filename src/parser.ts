@@ -1,11 +1,11 @@
 import Tmox from './tmox'
 import Token from './token'
 import TokenType from './tokentype'
-import { Expr, Binary, Unary, Literal, Grouping } from './expression'
+import { Expr, Binary, Unary, Literal, Grouping, Variable } from './expression'
+import { Stmt, Print, Expression, Declare } from './statement'
 
-
-class ParseError {
-
+class ParseError extends Error{
+    
 }
 
 export default class Parser {
@@ -19,12 +19,62 @@ export default class Parser {
         this.tmoxInstance = tmoxInstance
     }
 
-    parse(){
-        try { 
-            return this.expression()
-        }catch(error) {
-            return null;
+    parse(): Array<Stmt> {
+        let statements = new Array<Stmt>()
+
+        while (!this.isEnd()){
+
+          
+                statements.push(this.declaration())
+  
+        
         }
+
+        return statements;
+
+  
+        // try { 
+        //     return this.expression()
+        // }catch(error) {
+        //     return null;
+        // }
+    }
+
+    declaration(): Stmt{
+        try { 
+            if (this.match(TokenType.DEC)) return this.decDeclaration();
+            return this.statement()
+        }catch(error) {
+            this.synchronize();
+            throw new ParseError
+        }
+    }
+    decDeclaration(): Stmt {
+        let name: Token = this.consume(TokenType.IDENTIFIER, "Expect Variable Name");
+        let initializer = null;
+
+        if (this.match(TokenType.EQUAL)){
+            initializer = this.expression()
+        }
+        this.consume(TokenType.SEMICOLON, " Expect ';' after variable declaration")
+        return new Declare(name, initializer)
+    }
+    statement(): Stmt{
+        if (this.match(TokenType.PRINT)) return this.printStatement();
+
+        return this.expressionStatement()
+    }
+
+    printStatement(): Stmt {
+        let value: Expr = this.expression()
+        this.consume(TokenType.SEMICOLON, "Expect ';' after value")
+        return new Print(value)
+    }
+
+    expressionStatement(): Stmt{
+        let value: Expr = this.expression()
+        this.consume(TokenType.SEMICOLON, "Expect ';' after value")
+        return new Expression(value)
     }
 
     expression(): Expr {
@@ -91,6 +141,10 @@ export default class Parser {
 
         if (this.match(TokenType.NUMBER, TokenType.STRING)){
             return new Literal(this.previous().literal)
+        }
+
+        if (this.match(TokenType.IDENTIFIER)){
+            return new Variable(this.previous())
         }
 
         if (this.match(TokenType.LEFT_PAREN)){

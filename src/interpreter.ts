@@ -1,24 +1,35 @@
 import * as Expression from './expression'
+import * as Statement from './statement'
 import Tmox from './tmox'
 import TokenType from './tokentype'
 import Token from './token'
 import RuntimeError from './runtimeerror'
+import Environment from './environment'
 
-export default class Interpreter implements Expression.Visitor<any> {
+export default class Interpreter implements Expression.Visitor<any>, Statement.Visitor<void> {
     tmoxInstance: Tmox
+    environment: Environment
     constructor(tmoxInstance: Tmox){
         this.tmoxInstance = tmoxInstance
+        this.environment = new Environment()
     }
 
-    interpret(expression: Expression.Expr | null) {
+    interpret(statements: Array<Statement.Stmt>) {
         try {
-            if (expression){
-                let value: any = this.evaluate(expression);
-                console.log(value)
+            for (let statement of statements) {
+                this.execute(statement)
             }
         }catch(error) {
             this.tmoxInstance.runtimeError(error)
         }
+    }
+
+    execute (statement: Statement.Stmt){
+        statement.accept(this)
+    }
+
+    evaluate(expr: Expression.Expr): any {
+        return expr.accept(this)
     }
 
     visitLiteralExpr(expr: Expression.Literal): any {
@@ -91,9 +102,29 @@ export default class Interpreter implements Expression.Visitor<any> {
         return null
     }
 
-    evaluate(expr: Expression.Expr): any {
-        return expr.accept(this)
+    visitVariableExpr(expr: Expression.Variable): any {
+        return this.environment.get(expr.name)
     }
+
+    visitDecStmt(stmt: Statement.Declare): void {
+        let value = null;
+        if (stmt.initializer != null) {
+            value = this.evaluate(stmt.initializer)
+        }
+
+        this.environment.define(stmt.name.lexeme, value)
+      
+    }
+
+    visitExpressionStmt(stmt: Statement.Expression): void {
+        this.evaluate(stmt.expression)
+        
+    }
+    visitPrintStmt(stmt: Statement.Print): void {
+        let value: any = this.evaluate(stmt.expression)
+        console.log(value)
+    }
+
 
     isTruthy(object: any): boolean {
         if (object === null || object === undefined) {

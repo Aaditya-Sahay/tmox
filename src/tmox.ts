@@ -48,13 +48,13 @@ export default class Tmox {
             //console.log(token.toString())
         }
         let parser = new Parser(tokens, this)
-        let expression = parser.parse()
+        let statements = parser.parse()
         if (this.hadError) {
             return
         }
 
-        console.log(new AstDebugger().print(expression))
-        this.interpreter.interpret(expression)
+        // console.log(new AstDebugger().print(expression))
+        this.interpreter.interpret(statements)
 
 
     }
