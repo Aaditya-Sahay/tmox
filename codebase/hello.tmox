@@ -1,4 +1,1 @@
-// this is the tmox language
-while true {
-    print "hello nesse" + 2
-}
+dec hello = "Hello"

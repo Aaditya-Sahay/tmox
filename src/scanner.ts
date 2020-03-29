@@ -32,7 +32,7 @@ export default class Scanner {
         this.keywords.set("super", TokenType.SUPER);
         this.keywords.set("this", TokenType.THIS);
         this.keywords.set("true", TokenType.TRUE);
-        this.keywords.set("var", TokenType.VAR);
+        this.keywords.set("dec", TokenType.DEC);
         this.keywords.set("while", TokenType.WHILE);
     }
     tokenize(): Array<Token> {
