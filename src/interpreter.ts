@@ -112,6 +112,25 @@ export default class Interpreter implements Expression.Visitor<any>, Statement.V
 
     }
 
+
+    visitBlockStmt(stmt: Statement.Block): void{
+        this.executeBlock(stmt.statements, new Environment(this.environment));
+        return null;
+    }
+
+    executeBlock(statements: Array<Statement.Stmt>, environment: Environment){
+        let previous: Environment = this.environment;
+        try { 
+            this.environment = environment;
+            for (let statement of statements) {
+              
+                this.execute(statement)
+            }
+        }finally {
+            this.environment =  previous
+        }
+    }
+
     visitDecStmt(stmt: Statement.Declare): void {
         let value = null;
         if (stmt.initializer != null) {
@@ -130,6 +149,7 @@ export default class Interpreter implements Expression.Visitor<any>, Statement.V
         let value: any = this.evaluate(stmt.expression)
         console.log(value)
     }
+
 
 
     isTruthy(object: any): boolean {

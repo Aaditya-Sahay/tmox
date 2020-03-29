@@ -2,7 +2,7 @@ import Tmox from './tmox'
 import Token from './token'
 import TokenType from './tokentype'
 import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign } from './expression'
-import { Stmt, Print, Expression, Declare } from './statement'
+import { Stmt, Print, Expression, Declare, Block } from './statement'
 
 class ParseError extends Error{
     
@@ -57,8 +57,18 @@ export default class Parser {
     }
     statement(): Stmt{
         if (this.match(TokenType.PRINT)) return this.printStatement();
-
+        if (this.match(TokenType.LEFT_BRACE)) return new Block(this.block())
         return this.expressionStatement()
+    }
+
+    block(): Array<Stmt>{
+        let statements: Array<Stmt> = new Array<Stmt>();
+        while (!this.check(TokenType.RIGHT_BRACE) && !this.isEnd()){
+            statements.push(this.declaration())
+        }
+
+        this.consume(TokenType.RIGHT_BRACE, "Expect } after block opening");
+        return statements;
     }
 
     printStatement(): Stmt {

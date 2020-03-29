@@ -3,7 +3,7 @@ import Scanner from './scanner'
 import Parser from './parser'
 import Token from './token'
 import TokenType from './tokentype'
-import AstDebugger from './AstDebugger'
+
 import Interpreter from './interpreter'
 import RuntimeError from './runtimeerror'
 import fs from 'fs'

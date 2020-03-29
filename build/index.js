@@ -1,2 +1,8 @@
 "use strict";
-console.log("hello world");
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+var tmox_1 = __importDefault(require("./tmox"));
+var tmox = new tmox_1.default('./codebase/hello.tmox');
+tmox.init();
