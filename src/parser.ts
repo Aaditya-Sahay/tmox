@@ -1,8 +1,8 @@
 import Tmox from './tmox'
 import Token from './token'
 import TokenType from './tokentype'
-import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign } from './expression'
-import { Stmt, Print, Expression, Declare, Block } from './statement'
+import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign, Logical } from './expression'
+import { Stmt, Print, Expression, Declare, Block, If } from './statement'
 
 class ParseError extends Error{
     
@@ -56,9 +56,25 @@ export default class Parser {
         return new Declare(name, initializer)
     }
     statement(): Stmt{
+        if(this.match(TokenType.IF)) return this.ifStatement()
         if (this.match(TokenType.PRINT)) return this.printStatement();
         if (this.match(TokenType.LEFT_BRACE)) return new Block(this.block())
         return this.expressionStatement()
+    }
+    
+    ifStatement(): Stmt {
+        this.consume(TokenType.LEFT_PAREN, "Wrap your conditions in parenthesis")
+        let condition = this.expression()
+        this.consume(TokenType.RIGHT_PAREN, "Wrap your conditions in parenthesis")
+
+        let thenBranch: Stmt = this.statement()
+        let elseBranch: Stmt = null;
+        if  (this.match(TokenType.ELSE)) {
+            elseBranch =this.statement();
+        }
+
+        return new If(condition, thenBranch, elseBranch)
+
     }
 
     block(): Array<Stmt>{
@@ -88,7 +104,7 @@ export default class Parser {
     }
 
     assignment(): Expr{
-        let expr: Expr = this.equality();
+        let expr: Expr = this.or();
         if (this.match(TokenType.EQUAL)){
             let equals: Token = this.previous();
             let value: Expr = this.assignment()
@@ -101,6 +117,30 @@ export default class Parser {
             this.error(equals, "Invalid assignment")
         }
         return expr
+    }
+
+    or(): Expr {
+        let expr: Expr = this.and();
+
+        while (this.match(TokenType.OR)){
+            let operator: Token = this.previous();
+            let right = this.and()
+            expr =  new Logical(expr, operator, right)
+        }
+
+         return expr
+    }
+
+    and(): Expr {
+        let expr: Expr = this.equality();
+
+        while (this.match(TokenType.AND)){
+            let operator: Token = this.previous();
+            let right = this.equality()
+            expr =  new Logical(expr, operator, right)
+        }
+
+         return expr
     }
 
     equality(): Expr {

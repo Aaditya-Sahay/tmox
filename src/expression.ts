@@ -10,7 +10,7 @@ export interface Visitor<R> {
     // visitGetExpr(expr: Get): R;               
     visitGroupingExpr(expr: Grouping): R;     
     visitLiteralExpr(expr: Literal): R;       
-    // visitLogicalExpr(expr: Logical): R;       
+    visitLogicalExpr(expr: Logical): R;       
     // visitSetExpr(expr: Set): R;               
     // visitSuperExpr(expr: Super): R;           
     // visitThisExpr(expr: This): R;             
@@ -104,20 +104,20 @@ export class Literal extends Expr {
 }
 
 
-// export class Logical extends Expr {
-//     left: Expr
-//     right: Expr
-//     operator: Token
-//     constructor(left: Expr, right: Expr, operator: Token) {
-//         super()
-//         this.left = left;
-//         this.right = right;
-//         this.operator = operator;
-//     }
-//     accept(visitor: Visitor<any>): any{             
-//         return visitor.visitLogicalExpr(this);        
-//     }
-// }
+export class Logical extends Expr {
+    left: Expr
+    right: Expr
+    operator: Token
+    constructor(left: Expr,  operator: Token, right: Expr,) {
+        super()
+        this.left = left;
+        this.right = right;
+        this.operator = operator;
+    }
+    accept(visitor: Visitor<any>): any{             
+        return visitor.visitLogicalExpr(this);        
+    }
+}
 
 // export class Set extends Expr {
 //     object: Expr

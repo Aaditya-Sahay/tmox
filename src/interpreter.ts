@@ -49,6 +49,17 @@ export default class Interpreter implements Expression.Visitor<any>, Statement.V
 
         return null;
     }
+    visitLogicalExpr(expr: Expression.Logical): any {
+        let left: any = this.evaluate(expr.left);
+        
+        if (expr.operator.type === TokenType.OR) {
+            if (this.isTruthy(left)) return left;
+        }else {
+            if (!this.isTruthy(left)) return left;
+        }
+
+        return this.evaluate(expr.right)
+    }
     visitBinaryExpr(expr: Expression.Binary): any {
         let left: any = this.evaluate(expr.left)
         let right: any = this.evaluate(expr.right)
@@ -129,6 +140,14 @@ export default class Interpreter implements Expression.Visitor<any>, Statement.V
         }finally {
             this.environment =  previous
         }
+    }
+
+    visitIfStmt (stmt: Statement.If): void {
+        if (this.isTruthy(this.evaluate(stmt.condition))) {
+            this.execute(stmt.thenBranch);              
+        }else if (stmt.elseBranch != null) {    
+            this.execute(stmt.elseBranch);              
+        } 
     }
 
     visitDecStmt(stmt: Statement.Declare): void {

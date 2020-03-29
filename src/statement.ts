@@ -5,7 +5,7 @@ export interface Visitor<R> {
     // visitClassStmt(stmt: Class): R;           
     visitExpressionStmt(stmt: Expression): R;
     // visitFuncStmt(stmt: Func): R;     
-    // visitIfStmt(stmt: If): R;                 
+    visitIfStmt(stmt: If): R;                 
     visitPrintStmt(stmt: Print): R;
     // visitReturnStmt(stmt: Return): R;         
     visitDecStmt(stmt: Declare): R;
@@ -62,6 +62,21 @@ export class Block extends Stmt {
                   
     accept(visitor: Visitor<any>): any {
         return visitor.visitBlockStmt(this);
+    }
+}
+
+export class If extends Stmt {
+    condition: Expr
+    thenBranch: Stmt
+    elseBranch: Stmt
+    constructor(condition: Expr, thenBranch: Stmt, elseBranch: Stmt){
+        super()
+        this.condition = condition;
+        this.thenBranch = thenBranch;
+        this.elseBranch = elseBranch;
+    }
+    accept(visitor: Visitor<any>): any {
+        return visitor.visitIfStmt(this);
     }
 }
     
