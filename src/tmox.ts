@@ -4,22 +4,26 @@ import Parser from './parser'
 import Token from './token'
 import TokenType from './tokentype'
 import AstDebugger from './AstDebugger'
-
-import { Expr } from './expression'
+import Interpreter from './interpreter'
+import RuntimeError from './runtimeerror'
 import fs from 'fs'
 
 
 export default class Tmox {
     file: string
+    interpreter: Interpreter
     hadError: boolean
+    hadRuntimeError: boolean
     constructor(file: string) {
         this.file = file;
-
+        this.interpreter = new Interpreter(this)
         this.hadError = false;
+        this.hadRuntimeError = false;
     }
     init() {
         if (this.file) {
             if (this.hadError) process.exit(42);
+            if (this.hadRuntimeError) process.exit(75);
             this.execute();
 
         }
@@ -40,6 +44,9 @@ export default class Tmox {
     run(source: string) {
         let scanner = new Scanner(source, this);
         let tokens = scanner.tokenize();
+        for (let token of tokens) {
+            //console.log(token.toString())
+        }
         let parser = new Parser(tokens, this)
         let expression = parser.parse()
         if (this.hadError) {
@@ -47,6 +54,7 @@ export default class Tmox {
         }
 
         console.log(new AstDebugger().print(expression))
+        this.interpreter.interpret(expression)
 
 
     }
@@ -58,6 +66,10 @@ export default class Tmox {
             this.report(token.line, " at '" + token.lexeme + "'", message);
         }
 
+    }
+    runtimeError(error: RuntimeError) {
+        console.log(error.message + "[line" + error.token.line + "]" );
+        this.hadRuntimeError = true
     }
 
     report(line: number, where: string, message: string) {

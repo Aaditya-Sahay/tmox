@@ -46,7 +46,7 @@ export default class Parser {
         let expr: Expr = this.addition();
         while (this.match(TokenType.GREATER, TokenType.GREATER_EQUAL, TokenType.LESS, TokenType.LESS_EQUAL)) {
             let operator: Token = this.previous();
-            let right = this.comparision()
+            let right = this.addition()
             expr = new Binary(expr, operator, right)
         }
         return expr
@@ -57,7 +57,7 @@ export default class Parser {
         let expr: Expr = this.multiplication();
         while (this.match(TokenType.MINUS, TokenType.PLUS)) {
             let operator: Token = this.previous();
-            let right = this.comparision()
+            let right = this.multiplication()
             expr = new Binary(expr, operator, right)
         }
         return expr

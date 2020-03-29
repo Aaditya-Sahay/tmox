@@ -101,7 +101,7 @@ export default class Scanner {
     }
 
     addToken(type: TokenType, literal?: any) {
-        if (!literal) {
+        if (literal == undefined) {
             literal = null
         }
         let text = this.source.substring(this.start, this.current);
@@ -178,6 +178,7 @@ export default class Scanner {
             this.proceed();
             while (this.isDigit(this.peek())) this.proceed();
         }
+        
         this.addToken(TokenType.NUMBER, Number(this.source.substring(this.start, this.current)))
     }
     
