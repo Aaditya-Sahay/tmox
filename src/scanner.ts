@@ -41,7 +41,7 @@ export default class Scanner {
             this.scanToken();
         }
 
-        this.tokens.push(new Token(TokenType.EOF, "", {}, this.line));
+        this.tokens.push(new Token(TokenType.EOF, "", null, this.line));
         return this.tokens;
     }
     scanToken() {

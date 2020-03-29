@@ -1,8 +1,13 @@
 import * as Expression from './expression'
 
 export default class AstDebugger implements Expression.Visitor<String> {
-    print(expr: Expression.Expr): string{
-        return expr.accept(this)
+    print(expr: Expression.Expr | null): string{
+        if (expr){
+            return expr.accept(this)
+        }else {
+            return ""
+        }
+       
     }
 
     visitAssignExpr(expr: Expression.Assign): string{
