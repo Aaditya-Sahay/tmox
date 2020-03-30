@@ -51,7 +51,7 @@ export default class Interpreter implements Expression.Visitor<any>, Statement.V
     }
     visitLogicalExpr(expr: Expression.Logical): any {
         let left: any = this.evaluate(expr.left);
-        
+
         if (expr.operator.type === TokenType.OR) {
             if (this.isTruthy(left)) return left;
         }else {
@@ -148,6 +148,13 @@ export default class Interpreter implements Expression.Visitor<any>, Statement.V
         }else if (stmt.elseBranch != null) {    
             this.execute(stmt.elseBranch);              
         } 
+    }
+
+    visitWhileStmt (stmt: Statement.While): void {
+        while(this.isTruthy(this.evaluate(stmt.condition))){
+            this.execute(stmt.body);
+        }
+        return null;
     }
 
     visitDecStmt(stmt: Statement.Declare): void {

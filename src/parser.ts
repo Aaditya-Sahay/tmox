@@ -2,7 +2,7 @@ import Tmox from './tmox'
 import Token from './token'
 import TokenType from './tokentype'
 import { Expr, Binary, Unary, Literal, Grouping, Variable, Assign, Logical } from './expression'
-import { Stmt, Print, Expression, Declare, Block, If } from './statement'
+import { Stmt, Print, Expression, Declare, Block, If, While} from './statement'
 
 class ParseError extends Error{
     
@@ -56,10 +56,56 @@ export default class Parser {
         return new Declare(name, initializer)
     }
     statement(): Stmt{
+        if (this.match(TokenType.FOR)) return this.forStatement();
         if(this.match(TokenType.IF)) return this.ifStatement()
         if (this.match(TokenType.PRINT)) return this.printStatement();
+        if (this.match(TokenType.WHILE)) return this.whileStatement();
         if (this.match(TokenType.LEFT_BRACE)) return new Block(this.block())
         return this.expressionStatement()
+    }
+
+    forStatement(): Stmt {
+        this.consume(TokenType.LEFT_PAREN, "Wrap your conditions in parenthesis after for");
+        let initializer: Stmt;
+        if (this.match(TokenType.SEMICOLON)){
+            initializer = null;
+        }else if (this.match(TokenType.DEC)){
+            initializer = this.decDeclaration();
+        }else {
+            initializer = this.expressionStatement();
+        }
+        let condition: Expr = null;
+        if (!this.check(TokenType.SEMICOLON)){
+            condition = this.expression();
+        }
+        this.consume(TokenType.SEMICOLON, "Expected ; after loop condition")
+
+        let increment: Expr = null;
+        if (!this.check(TokenType.RIGHT_PAREN)){
+            increment = this.expression()
+        }
+        this.consume(TokenType.RIGHT_PAREN, "Expect after ) clauses")
+        
+        let body: Stmt = this.statement();
+
+        if (increment != null){
+            body = new Block([
+                body,
+                new Expression(increment)
+            ])
+        }
+        if (condition == null) condition = new Literal(true);
+        body = new While(condition, body);
+
+
+        if (initializer != null) {
+            body = new Block([
+                initializer,
+                body
+            ])
+        }
+
+        return body;
     }
     
     ifStatement(): Stmt {
@@ -72,8 +118,25 @@ export default class Parser {
         if  (this.match(TokenType.ELSE)) {
             elseBranch =this.statement();
         }
+        
 
         return new If(condition, thenBranch, elseBranch)
+
+    }
+
+    printStatement(): Stmt {
+        let value: Expr = this.expression()
+        this.consume(TokenType.SEMICOLON, "Expect ';' after value")
+        return new Print(value)
+    }
+
+    whileStatement(): Stmt {
+        this.consume(TokenType.LEFT_PAREN, "Wrap your condition in parenthesis")
+        let condition = this.expression();
+        this.consume(TokenType.RIGHT_PAREN, "Wrap your condition in parenthesis")
+        let body: Stmt = this.statement();
+
+        return new While(condition, body)
 
     }
 
@@ -87,11 +150,7 @@ export default class Parser {
         return statements;
     }
 
-    printStatement(): Stmt {
-        let value: Expr = this.expression()
-        this.consume(TokenType.SEMICOLON, "Expect ';' after value")
-        return new Print(value)
-    }
+    
 
     expressionStatement(): Stmt{
         let value: Expr = this.expression()
@@ -100,7 +159,7 @@ export default class Parser {
     }
 
     expression(): Expr {
-        return this.assignment()
+        return this.assignment() 
     }
 
     assignment(): Expr{

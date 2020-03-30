@@ -9,7 +9,7 @@ export interface Visitor<R> {
     visitPrintStmt(stmt: Print): R;
     // visitReturnStmt(stmt: Return): R;         
     visitDecStmt(stmt: Declare): R;
-    // visitWhileStmt(stmt: While): R;
+    visitWhileStmt(stmt: While): R;
 }
 
 export abstract class Stmt {
@@ -79,4 +79,18 @@ export class If extends Stmt {
         return visitor.visitIfStmt(this);
     }
 }
-    
+
+
+export class While extends Stmt {
+    condition: Expr
+    body: Stmt
+    constructor(condition: Expr, body: Stmt){
+        super()
+        this.condition = condition;
+        this.body = body;
+    }
+
+    accept(visitor: Visitor<any>): any {
+        return visitor.visitWhileStmt(this);
+    }
+}
