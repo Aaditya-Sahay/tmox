@@ -23,7 +23,7 @@ export default class Scanner {
         this.keywords.set("else", TokenType.ELSE);
         this.keywords.set("false", TokenType.FALSE);
         this.keywords.set("for", TokenType.FOR);
-        this.keywords.set("fun", TokenType.FUN);
+        this.keywords.set("fn", TokenType.FUN);
         this.keywords.set("if", TokenType.IF);
         this.keywords.set("nil", TokenType.NIL);
         this.keywords.set("or", TokenType.OR);

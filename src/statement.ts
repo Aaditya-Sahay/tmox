@@ -4,8 +4,8 @@ export interface Visitor<R> {
     visitBlockStmt(stmt: Block): R;
     // visitClassStmt(stmt: Class): R;           
     visitExpressionStmt(stmt: Expression): R;
-    // visitFuncStmt(stmt: Func): R;     
-    visitIfStmt(stmt: If): R;                 
+    visitFuncStmt(stmt: Func): R;
+    visitIfStmt(stmt: If): R;
     visitPrintStmt(stmt: Print): R;
     // visitReturnStmt(stmt: Return): R;         
     visitDecStmt(stmt: Declare): R;
@@ -59,7 +59,7 @@ export class Block extends Stmt {
         this.statements = statements;
     }
 
-                  
+
     accept(visitor: Visitor<any>): any {
         return visitor.visitBlockStmt(this);
     }
@@ -69,7 +69,7 @@ export class If extends Stmt {
     condition: Expr
     thenBranch: Stmt
     elseBranch: Stmt
-    constructor(condition: Expr, thenBranch: Stmt, elseBranch: Stmt){
+    constructor(condition: Expr, thenBranch: Stmt, elseBranch: Stmt) {
         super()
         this.condition = condition;
         this.thenBranch = thenBranch;
@@ -84,7 +84,7 @@ export class If extends Stmt {
 export class While extends Stmt {
     condition: Expr
     body: Stmt
-    constructor(condition: Expr, body: Stmt){
+    constructor(condition: Expr, body: Stmt) {
         super()
         this.condition = condition;
         this.body = body;
@@ -94,3 +94,22 @@ export class While extends Stmt {
         return visitor.visitWhileStmt(this);
     }
 }
+
+export class Func extends Stmt {
+    name: Token;
+    params: Array<Token>
+    body: Array<Stmt>
+    constructor(name: Token, params: Array<Token>, body: Array<Stmt>) {
+        super()
+        this.name = name;
+        this.params = params;
+        this.body = body;
+    }
+
+
+    accept(visitor: Visitor<any>): any {
+        return visitor.visitFuncStmt(this);
+    }
+
+
+}       

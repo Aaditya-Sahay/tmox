@@ -6,7 +6,7 @@ import Token from './token'
 export interface Visitor<R> {
     visitAssignExpr(expr: Assign): R;         
     visitBinaryExpr(expr: Binary): R;         
-    // visitCallExpr(expr: Call): R;             
+    visitCallExpr(expr: Call): R;             
     // visitGetExpr(expr: Get): R;               
     visitGroupingExpr(expr: Grouping): R;     
     visitLiteralExpr(expr: Literal): R;       
@@ -51,20 +51,20 @@ export class Assign extends Expr {
     }
 }
 
-// export class Call extends Expr {
-//     callee: Expr
-//     paren: Token
-//     args: Array<Expr>
-//     constructor(callee: Expr, paren: Token, args: Array<Expr>) {
-//         super()
-//         this.callee = callee
-//         this.paren = paren
-//         this.args = args
-//     }
-//     accept(visitor: Visitor<any>): any{             
-//         return visitor.visitCallExpr(this);        
-//     }
-// }
+export class Call extends Expr {
+    callee: Expr
+    paren: Token
+    args: Array<Expr>
+    constructor(callee: Expr, paren: Token, args: Array<Expr>) {
+        super()
+        this.callee = callee
+        this.paren = paren
+        this.args = args
+    }
+    accept(visitor: Visitor<any>): any{             
+        return visitor.visitCallExpr(this);        
+    }
+}
 
 // export class Get extends Expr {
 //     name: Token

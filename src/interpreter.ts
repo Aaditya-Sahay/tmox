@@ -5,13 +5,26 @@ import TokenType from './tokentype'
 import Token from './token'
 import RuntimeError from './runtimeerror'
 import Environment from './environment'
+import Callable from './callable'
 
 export default class Interpreter implements Expression.Visitor<any>, Statement.Visitor<void> {
     tmoxInstance: Tmox
     environment: Environment
+    globals: Environment
     constructor(tmoxInstance: Tmox){
         this.tmoxInstance = tmoxInstance
-        this.environment = new Environment()
+        this.globals = new Environment()
+        this.environment = this.globals
+        let clockCallable:Callable =  {
+            arity(): number{
+                return 0
+            },
+            call(interpreter: Interpreter, args: Array<any>): any{
+                return Date.now()
+            },
+           
+        }
+        this.globals.define("clock", clockCallable)
     }
 
     interpret(statements: Array<Statement.Stmt>) {
@@ -49,6 +62,21 @@ export default class Interpreter implements Expression.Visitor<any>, Statement.V
 
         return null;
     }
+
+    visitCallExpr(expr: Expression.Call){
+        let callee: any = this.evaluate(expr.callee);
+        let args = new Array<any>();
+        for (let arg of args){
+            args.push(this.evaluate(arg));
+        }
+        let func: Callable = callee;
+        if (args.length !== func.arity()){
+            throw new RuntimeError(expr.paren, `Expected ${func.arity()} arguments but found ${args.length}`)
+        }
+        return func.call(this, args);
+
+    }
+
     visitLogicalExpr(expr: Expression.Logical): any {
         let left: any = this.evaluate(expr.left);
 
