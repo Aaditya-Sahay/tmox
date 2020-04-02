@@ -1,7 +1,15 @@
 import Interpreter from './interpreter'
 
-export default interface Callable {
-    
+
+
+
+export interface Callable {
+    arity():number 
     call(interpreter: Interpreter, args: any[]) : any
-    arity():number
+    toString():string
+   
+}
+
+export function isCallable(object: any): object is Callable{
+    return 'call' in object;
 }

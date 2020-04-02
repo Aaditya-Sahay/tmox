@@ -5,7 +5,9 @@ import TokenType from './tokentype'
 import Token from './token'
 import RuntimeError from './runtimeerror'
 import Environment from './environment'
-import Callable from './callable'
+import TmoxFunction from './tmoxfunction'
+
+import { Callable, isCallable } from './callable'
 
 export default class Interpreter implements Expression.Visitor<any>, Statement.Visitor<void> {
     tmoxInstance: Tmox
@@ -15,14 +17,16 @@ export default class Interpreter implements Expression.Visitor<any>, Statement.V
         this.tmoxInstance = tmoxInstance
         this.globals = new Environment()
         this.environment = this.globals
-        let clockCallable:Callable =  {
+        let clockCallable = new class implements Callable {
             arity(): number{
                 return 0
-            },
+            }
             call(interpreter: Interpreter, args: Array<any>): any{
                 return Date.now()
-            },
-           
+            }
+            toString(): string{
+                return "native function"
+            }
         }
         this.globals.define("clock", clockCallable)
     }
@@ -66,11 +70,15 @@ export default class Interpreter implements Expression.Visitor<any>, Statement.V
     visitCallExpr(expr: Expression.Call){
         let callee: any = this.evaluate(expr.callee);
         let args = new Array<any>();
-        for (let arg of args){
+        for (let arg of expr.args){
             args.push(this.evaluate(arg));
+        }
+        if(!isCallable(callee)){
+            throw new RuntimeError(expr.paren, `Is not a callable`)
         }
         let func: Callable = callee;
         if (args.length !== func.arity()){
+            console.log(func.arity())
             throw new RuntimeError(expr.paren, `Expected ${func.arity()} arguments but found ${args.length}`)
         }
         return func.call(this, args);
@@ -198,6 +206,11 @@ export default class Interpreter implements Expression.Visitor<any>, Statement.V
     visitExpressionStmt(stmt: Statement.Expression): void {
         this.evaluate(stmt.expression)
         
+    }
+    visitFuncStmt(stmt: Statement.Func): void{
+        let func = new TmoxFunction(stmt);
+        this.environment.define(stmt.name.lexeme, func)
+        return null;
     }
     visitPrintStmt(stmt: Statement.Print): void {
         let value: any = this.evaluate(stmt.expression)

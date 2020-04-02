@@ -38,7 +38,7 @@ export default class Parser {
 
     declaration(): Stmt {
         try {
-            if (this.match(TokenType.FUN)) return func("function")
+            if (this.match(TokenType.FUN)) return this.func("function")
             if (this.match(TokenType.DEC)) return this.decDeclaration();
             return this.statement()
         } catch (error) {
